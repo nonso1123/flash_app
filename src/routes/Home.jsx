@@ -24,7 +24,7 @@ const Home = () => {
 	};
 
 	useEffect(() => {
-		isMounted = true; // Track if component is mounted
+		isMounted = false; // Track if component is mounted
 		fetchData();
 
 		return () => {
