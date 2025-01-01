@@ -1,2 +1,2 @@
-export const SERVER_URL = "http://127.0.0.1:8000/api";
-export const BASE_URL = "http://127.0.0.1:8000";
+export const SERVER_URL = "https://flashapp-fx5o.onrender.com/api";
+export const BASE_URL = "https://flashapp-fx5o.onrender.com";
