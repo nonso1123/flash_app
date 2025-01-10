@@ -17,6 +17,7 @@ const Update = () => {
 	const { id } = useParams(); // Get post ID from the URL
 	const navigate = useNavigate();
 	const [description, setDescription] = useState("");
+	const [loading, setLoading] = useState(null);
 	const [postImage, setPostImage] = useState(null); // New image file if selected
 	const [currentImage, setCurrentImage] = useState(""); // Existing image URL
 
@@ -37,6 +38,7 @@ const Update = () => {
 	const user = JSON.parse(localStorage.getItem("userData"))["username"];
 	// Handle update submission
 	const handleUpdate = async () => {
+		setLoading(true);
 		const formData = new FormData();
 		formData.append("description", description);
 
@@ -47,6 +49,7 @@ const Update = () => {
 
 		try {
 			await update_post(id, formData); // Send updated data
+			setLoading(false);
 			alert("Post updated successfully");
 			navigate(`/${user}`); // Navigate back to home or another route
 		} catch {
@@ -80,9 +83,16 @@ const Update = () => {
 				{currentImage && !postImage && (
 					<Image src={currentImage} alt="Current Post Image" boxSize="100px" />
 				)} */}
-				<Button w="100%" colorScheme="blue" onClick={handleUpdate} mb="20px">
-					Update Post
-				</Button>
+
+				{loading === true ? (
+					<Button w="100%" colorScheme="blue" onClick={handleUpdate} mb="20px">
+						Updating Post...
+					</Button>
+				) : (
+					<Button w="100%" colorScheme="blue" onClick={handleUpdate} mb="20px">
+						Update Post
+					</Button>
+				)}
 			</VStack>
 		</Flex>
 	);

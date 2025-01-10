@@ -6,14 +6,17 @@ import Post from "../components/Post";
 const Home = () => {
 	const [posts, setPosts] = useState([]);
 	const [loading, setLoading] = useState(true);
+	const [checking, setChecking] = useState(null);
 	const [nextPage, setNextPage] = useState(1);
 	let isMounted = true;
 	const fetchData = async () => {
 		try {
+			setChecking(true);
 			const data = await get_posts(nextPage);
 			// if (!isMounted) return; // Skip updates if unmounted
 			setPosts([...posts, ...data.results]);
 			setNextPage(data.next ? nextPage + 1 : null);
+			setChecking(false);
 		} catch {
 			if (!isMounted) return; // Skip alert if unmounted
 			alert("error getting posts");
@@ -52,7 +55,12 @@ const Home = () => {
 					))
 				)}
 				{nextPage !== null && !loading && (
-					<Button w="100%" colorScheme="blue" onClick={fetchData}>
+					<Button
+						w="100%"
+						colorScheme="blue"
+						onClick={fetchData}
+						isLoading={checking}
+					>
 						Load more
 					</Button>
 				)}

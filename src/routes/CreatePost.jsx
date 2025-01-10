@@ -16,13 +16,16 @@ const CreatePost = () => {
 	const navigate = useNavigate();
 	const [description, setDescription] = useState("");
 	const [postImage, setPostImage] = useState("");
+	const [loading, setLoading] = useState(null);
 
 	const handlePost = async () => {
+		setLoading(true);
 		try {
 			const data = await create_post({
 				description: description,
 				post_image: postImage,
 			});
+			setLoading(false);
 			alert("Post created successfully");
 			navigate(`/`);
 		} catch {
@@ -50,9 +53,16 @@ const CreatePost = () => {
 						onChange={(e) => setPostImage(e.target.files[0])}
 					/>
 				</FormControl>
-				<Button w="100%" colorScheme="blue" onClick={handlePost}>
-					Create Post
-				</Button>
+
+				{loading === true ? (
+					<Button w="100%" colorScheme="blue" onClick={handlePost} mb="20px">
+						Creating Post...
+					</Button>
+				) : (
+					<Button w="100%" colorScheme="blue" onClick={handlePost} mb="20px">
+						Create Post
+					</Button>
+				)}
 			</VStack>
 		</Flex>
 	);

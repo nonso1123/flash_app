@@ -16,6 +16,8 @@ import { useNavigate } from "react-router-dom";
 const Setting = () => {
 	const storage = JSON.parse(localStorage.getItem("userData"));
 	const [username, setUsername] = useState(storage ? storage.username : "");
+	const [loading, setLoading] = useState(null);
+	const [isLogout, setIsLogout] = useState(null);
 	const [email, setEmail] = useState(storage ? storage.email : "");
 	const [firstName, setFirstName] = useState(storage ? storage.first_name : "");
 	const [lastName, setLastName] = useState(storage ? storage.last_name : "");
@@ -25,38 +27,56 @@ const Setting = () => {
 	);
 	const navigate = useNavigate();
 	const handleUpdate = async () => {
+		setLoading(true);
 		try {
-			await update_user({
-				username: username,
-				profile_image: profileImage,
-				email: email,
-				first_name: firstName,
-				last_name: lastName,
-				bio: bio,
-			});
+			const formData = new FormData();
 
-			localStorage.setItem(
-				"userData",
-				JSON.stringify({
-					username: username,
-					email: email,
-					first_name: firstName,
-					last_name: lastName,
-					bio: bio,
-				})
-			);
-			sessionStorage.removeItem("scrollPosition");
-			navigate(`/${username}`);
-			alert("successfully updated");
-		} catch {
-			alert("error updating details");
+			// Add profile image only if it's a new file
+			if (profileImage instanceof File) {
+				formData.append("profile_image", profileImage);
+			}
+
+			// Append other fields
+			formData.append("username", username);
+			formData.append("email", email);
+			formData.append("first_name", firstName);
+			formData.append("last_name", lastName);
+			formData.append("bio", bio);
+
+			// Send the request and get the updated data from the backend
+			const response = await update_user(username, formData);
+
+			// Check for success response
+			if (response.success) {
+				// Update localStorage with the returned data
+				localStorage.setItem("userData", JSON.stringify(response));
+
+				// Update state
+				setUsername(response.username);
+				setEmail(response.email);
+				setFirstName(response.first_name);
+				setLastName(response.last_name);
+				setBio(response.bio?.toString());
+				setProfileImage(response.profile_image); // Update with new or old image
+				navigate(`/${username}`);
+				alert("Successfully updated");
+			} else {
+				alert("Error updating profile");
+			}
+		} catch (error) {
+			console.error("Error updating profile:", error);
+			alert("Error updating details");
+		} finally {
+			setLoading(false);
 		}
 	};
 
 	const handleLogout = async () => {
+		setIsLogout(true);
 		try {
 			await logout();
 			navigate("/login");
+			setIsLogout(false);
 		} catch {
 			alert("error logging out");
 		}
@@ -74,7 +94,7 @@ const Setting = () => {
 							onChange={(e) => setProfileImage(e.target.files[0])}
 						/>
 					</FormControl>
-					<FormControl>
+					{/* <FormControl>
 						<FormLabel>Username</FormLabel>
 						<Input
 							bg="white"
@@ -82,7 +102,7 @@ const Setting = () => {
 							value={username}
 							onChange={(e) => setUsername(e.target.value)}
 						/>
-					</FormControl>
+					</FormControl> */}
 					<FormControl>
 						<FormLabel>Email</FormLabel>
 						<Input
@@ -119,13 +139,36 @@ const Setting = () => {
 							onChange={(e) => setBio(e.target.value)}
 						/>
 					</FormControl>
-					<Button w="100%" colorScheme="blue" mt="10px" onClick={handleUpdate}>
-						Save Changes
-					</Button>
+					{loading === true ? (
+						<Button
+							w="100%"
+							colorScheme="blue"
+							mt="10px"
+							onClick={handleUpdate}
+						>
+							Saving Changes...
+						</Button>
+					) : (
+						<Button
+							w="100%"
+							colorScheme="blue"
+							mt="10px"
+							onClick={handleUpdate}
+						>
+							Save Changes
+						</Button>
+					)}
 				</VStack>
-				<Button colorScheme="red" onClick={handleLogout}>
-					Logout
-				</Button>
+
+				{isLogout === true ? (
+					<Button colorScheme="red" onClick={handleLogout}>
+						Logging out...
+					</Button>
+				) : (
+					<Button colorScheme="red" onClick={handleLogout}>
+						Logout
+					</Button>
+				)}
 			</VStack>
 		</Flex>
 	);

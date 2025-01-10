@@ -18,6 +18,7 @@ import {
 import { BASE_URL } from "../constants/constants";
 import Post from "../components/Post";
 import { Link, Navigate } from "react-router-dom";
+import emptyImg from "../assets/empty_img.png";
 
 const User_profile = () => {
 	const get_username_from_url = () => {
@@ -44,7 +45,7 @@ export default User_profile;
 const UserDetails = ({ username }) => {
 	const [loading, setLoading] = useState(true);
 	const [bio, setBio] = useState("");
-	const [profileImage, setProfileImage] = useState("");
+	const [profileImage, setProfileImage] = useState();
 	const [followerCount, setFollowerCount] = useState(0);
 	const [followingCount, setFollowingCount] = useState(0);
 	const [isOurProfile, setIsOurProfile] = useState(false);
@@ -54,7 +55,9 @@ const UserDetails = ({ username }) => {
 		try {
 			const data = await get_user_profile_data(username);
 			setBio(data.bio);
-			setProfileImage(data.profile_image);
+			setProfileImage(
+				data.profile_image ? `${BASE_URL}${data.profile_image}` : emptyImg
+			);
 			setFollowerCount(data.follower_count);
 			setFollowingCount(data.following_count);
 			setIsOurProfile(data.is_our_profile);
@@ -96,11 +99,7 @@ const UserDetails = ({ username }) => {
 					borderRadius="full"
 					overflow="hidden"
 				>
-					<Image
-						src={loading ? "" : `${BASE_URL}${profileImage}`}
-						boxSize="100%"
-						objectFit="cover"
-					/>
+					<Image src={profileImage} boxSize="100%" objectFit="cover" />
 				</Box>
 				<VStack gap="20px" alignItems="start" w={{ base: "100%", sm: "auto" }}>
 					<HStack

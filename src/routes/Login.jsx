@@ -106,9 +106,14 @@ const Login = () => {
 							</Button>
 						)}
 
-						<Text onClick={handleNav}>
+						<Text>
 							Dont have an account?{" "}
-							<Text as="span" color="blue.500" cursor="pointer">
+							<Text
+								as="span"
+								color="blue.500"
+								cursor="pointer"
+								onClick={handleNav}
+							>
 								Register
 							</Text>
 						</Text>

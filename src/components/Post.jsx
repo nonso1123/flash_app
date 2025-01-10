@@ -31,6 +31,11 @@ const Post = ({
 	const handleNavigate = () => {
 		navigate(`/update_post/${id}`);
 	};
+	const handleUser = () => {
+		sessionStorage.removeItem("scrollPosition");
+		navigate(`/${username}`);
+	};
+
 	// Navigate to full post page
 	const handleViewPost = () => {
 		sessionStorage.setItem("scrollPosition", window.scrollY);
@@ -84,7 +89,14 @@ const Post = ({
 
 	return (
 		<VStack
-			w="325px"
+			sx={{
+				"@media (max-width: 359px)": {
+					w: "290px",
+				},
+				"@media (min-width: 360px)": {
+					w: "325px",
+				},
+			}}
 			h="400px"
 			border="1px solid"
 			borderRadius="8px"
@@ -100,7 +112,9 @@ const Post = ({
 				flex="2"
 				justifyContent="space-between"
 			>
-				<Text>{username}</Text>
+				<Text onClick={handleUser} cursor="pointer">
+					{username}
+				</Text>
 				{user === username && window.location.pathname !== "/" ? (
 					<HStack>
 						<Text onClick={handleNavigate} cursor="pointer" color="blue.500">
@@ -148,7 +162,12 @@ const Post = ({
 				h="100%"
 				alignItems="center"
 			>
-				<Text textAlign="justify" w="90%">
+				<Text
+					textAlign="center"
+					w="90%"
+					onClick={handleViewPost}
+					cursor="pointer"
+				>
 					{description.length > (post_image === null ? 400 : 40) ? (
 						<>
 							{description.substring(0, post_image === null ? 400 : 40)}...{" "}

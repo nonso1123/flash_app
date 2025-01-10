@@ -44,8 +44,8 @@ export const register = async (
 	username,
 	password,
 	email,
-	lastName,
-	firstName
+	firstName,
+	lastName
 ) => {
 	const response = await api.post("/register/", {
 		username: username,
@@ -89,12 +89,16 @@ export const search_user = async (search) => {
 	const response = await api.get(`/search_user/?query=${search}`);
 	return response.data;
 };
+export const check_username = async (username) => {
+	const response = await api.get(`/check-username?username=${username}`);
+	return response.data;
+};
 export const logout = async () => {
 	const response = await api.post("/logout/");
 	return response.data;
 };
-export const update_user = async (values) => {
-	const response = await api.patch("/update_user/", values, {
+export const update_user = async (username, values) => {
+	const response = await api.patch(`/update_user/${username}/`, values, {
 		headers: { "Content-Type": "multipart/form-data" },
 	});
 	return response.data;

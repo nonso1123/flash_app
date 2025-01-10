@@ -1,6 +1,5 @@
 import {
 	Box,
-	Button,
 	Flex,
 	Heading,
 	HStack,
@@ -13,14 +12,32 @@ import React, { useState } from "react";
 import { search_user } from "../api/endpoints";
 import { BASE_URL } from "../constants/constants";
 import { useNavigate } from "react-router-dom";
+import emptyImg from "../assets/empty_img.png";
 
 const Search = () => {
 	const [search, setSearch] = useState("");
 	const [users, setUsers] = useState([]);
 
-	const handleSearch = async () => {
-		const users = await search_user(search);
-		setUsers(users);
+	// Function to fetch users from the API
+	const fetchUsers = async (query) => {
+		try {
+			const users = await search_user(query);
+			setUsers(users);
+		} catch (error) {
+			console.error("Error fetching users:", error);
+		}
+	};
+
+	// Handle input change and fetch users
+	const handleSearchChange = (e) => {
+		const query = e.target.value;
+		setSearch(query);
+
+		if (query.trim() === "") {
+			setUsers([]); // Clear results if input is empty
+		} else {
+			fetchUsers(query); // Fetch results for non-empty input
+		}
 	};
 
 	return (
@@ -28,14 +45,17 @@ const Search = () => {
 			<VStack w="95%" maxW="500px" alignItems="start" gap="20px">
 				<Heading>Search Users</Heading>
 				<HStack w="100%" gap="0">
-					<Input bg="white" onChange={(e) => setSearch(e.target.value)} />
-					<Button colorScheme="blue" onClick={handleSearch}>
-						Search
-					</Button>
+					<Input
+						bg="white"
+						value={search}
+						onChange={handleSearchChange}
+						placeholder="Type to search..."
+					/>
 				</HStack>
 				<VStack w="100%">
 					{users.map((user) => (
 						<UserProfile
+							key={user.username}
 							username={user.username}
 							profile_image={user.profile_image}
 							first_name={user.first_name}
@@ -77,11 +97,15 @@ const UserProfile = ({ username, profile_image, first_name, last_name }) => {
 					borderRadius="full"
 					overflow="hidden"
 				>
-					<Image
-						src={`${BASE_URL}${profile_image}`}
-						boxSize="100%"
-						objectFit="cover"
-					/>
+					{profile_image === null ? (
+						<Image src={emptyImg} boxSize="100%" objectFit="cover" />
+					) : (
+						<Image
+							src={`${BASE_URL}${profile_image}`}
+							boxSize="100%"
+							objectFit="cover"
+						/>
+					)}
 				</Box>
 				<VStack alignItems="start">
 					<Text fontWeight="medium">
